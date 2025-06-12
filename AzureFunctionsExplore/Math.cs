@@ -5,11 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AzureFunctionsExplore;
 
-public class Math(ILogger<Math> logger)
+public class Math(IOptions<JsonSerializerOptions> jsonSerializerOptions, ILogger<Math> logger)
 {
+    private readonly JsonSerializerOptions _jsonSerializerOptions = jsonSerializerOptions.Value;
+    
     [Function("Double")]
     [OpenApiOperation("Double")]
     [OpenApiRequestBody("application/json", typeof(Body), Required = true)]
@@ -17,7 +20,7 @@ public class Math(ILogger<Math> logger)
     public async Task<IActionResult> Double([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest request)
     {
         var requestBodyString = await new StreamReader(request.Body).ReadToEndAsync();
-        var requestBody = JsonSerializer.Deserialize<Body>(requestBodyString);
+        var requestBody = JsonSerializer.Deserialize<Body>(requestBodyString, _jsonSerializerOptions);
         logger.LogInformation("Doubling number: {number}", requestBody?.Double);
         return new OkObjectResult(new Body (requestBody?.Double * 2 ?? 0 ));
     }
