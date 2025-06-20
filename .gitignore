@@ -1,4 +1,11 @@
-bin
-obj
 .idea
 *.DotSettings.user
+
+.terraform
+*.tfstate
+terraform.tfvars
+terraform/tfplan
+
+bin
+obj
+publish
