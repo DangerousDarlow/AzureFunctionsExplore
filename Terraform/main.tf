@@ -27,12 +27,22 @@ resource "azurerm_storage_account" "storage_account" {
   tags                = var.tags
 }
 
+resource "azurerm_log_analytics_workspace" "log_analytics" {
+  location            = azurerm_resource_group.resource_group.location
+  name                = var.project_name
+  resource_group_name = azurerm_resource_group.resource_group.name
+  retention_in_days   = 30
+  sku                 = "PerGB2018"
+  tags                = var.tags
+}
+
 resource "azurerm_application_insights" "app_insights" {
   application_type    = "web"
   location            = azurerm_resource_group.resource_group.location
   name                = var.project_name
   resource_group_name = azurerm_resource_group.resource_group.name
   tags                = var.tags
+  workspace_id        = azurerm_log_analytics_workspace.log_analytics.id
 }
 
 resource "azurerm_service_plan" "service_plan" {
