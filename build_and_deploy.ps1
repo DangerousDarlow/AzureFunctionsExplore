@@ -36,7 +36,8 @@ try {
     }
     
     Write-Host "Build Succeeded" -ForegroundColor Green
-} catch {
+}
+catch {
     Write-Host "Build Failed - $($_.Exception.Message)" -ForegroundColor Red
     exit 1
 }
@@ -62,8 +63,13 @@ try {
 
     Compress-Archive -Path "$publishPath\*" -DestinationPath $packagePath -Force
 
+    if ($LASTEXITCODE -ne 0) {
+        throw "Archiving failed"
+    }
+
     Write-Host "Package Succeeded" -ForegroundColor Green
-} catch {
+}
+catch {
     Write-Host "Package Failed - $($_.Exception.Message)" -ForegroundColor Red
     exit 1
 }
@@ -99,6 +105,10 @@ try {
     Write-Host "Stopping app..." -ForegroundColor Cyan
     az functionapp stop --resource-group $resourceGroupName --name $appName --output none
 
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to stop the app"
+    }
+
     Write-Host "Uploading deployment package..." -ForegroundColor Cyan
     az functionapp deployment source config-zip `
         --resource-group $resourceGroupName `
@@ -107,8 +117,16 @@ try {
         --build-remote false `
         --timeout 300
 
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to upload the deployment package"
+    }
+
     Write-Host "Starting app..." -ForegroundColor Cyan
     az functionapp start --resource-group $resourceGroupName --name $appName --output none
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to start the app"
+    }
 
     Write-Host "$appName at: https://$appUrl" -ForegroundColor Cyan
 
@@ -118,12 +136,14 @@ try {
     $appStatus = az functionapp show --resource-group $resourceGroupName --name $appName --query "state" --output tsv
     if ($appStatus -eq "Running") {
         Write-Host "App is running" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "App status: $appStatus" -ForegroundColor Yellow
     }
 
     Write-Host "Deploy Succeeded" -ForegroundColor Green
-} catch {
+}
+catch {
     Write-Host "Deploy Failed - $($_.Exception.Message)" -ForegroundColor Red
     exit 1
 }
