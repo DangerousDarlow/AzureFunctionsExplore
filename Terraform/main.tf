@@ -22,7 +22,7 @@ resource "azurerm_storage_account" "storage_account" {
   account_replication_type = "LRS" // Locally redundant storage
   account_tier        = "Standard"
   location            = azurerm_resource_group.resource_group.location
-  name                = "azfuncexplore7x9k"
+  name                = var.storage_account_name
   resource_group_name = azurerm_resource_group.resource_group.name
   tags                = var.tags
 }
@@ -82,5 +82,6 @@ resource "azurerm_linux_function_app" "function_app" {
     "FUNCTIONS_WORKER_RUNTIME"              = "dotnet-isolated"
     "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.app_insights.connection_string
     "WEBSITE_RUN_FROM_PACKAGE"              = "1"
+    "FUNCTIONS_DOTNET_VERSION"              = "9"
   }
 }

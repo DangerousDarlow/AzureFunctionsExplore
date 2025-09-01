@@ -3,6 +3,11 @@
   default = "azure-functions-explore"
 }
 
+variable "storage_account_name" {
+  type    = string
+  default = "azfuncexplore7x9k"
+}
+
 variable "location" {
   type    = string
   default = "UK West"
