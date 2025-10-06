@@ -17,7 +17,7 @@ public class Math(IOptions<JsonSerializerOptions> jsonSerializerOptions, ILogger
     [OpenApiOperation("Double")]
     [OpenApiRequestBody("application/json", typeof(Body), Required = true)]
     [OpenApiResponseWithBody(HttpStatusCode.OK, "'application/json'", typeof(Body))]
-    public async Task<IActionResult> Double([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest request)
+    public async Task<IActionResult> Double([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest request)
     {
         var requestBodyString = await new StreamReader(request.Body).ReadToEndAsync();
         var requestBody = JsonSerializer.Deserialize<Body>(requestBodyString, _jsonSerializerOptions);
